@@ -19,7 +19,13 @@
                 GoLift(etg);
               }
             "
-            ><div class="circle"></div
+            ><div
+              class="circle"
+              :class="{
+                active: activelift.includes(etg),
+                animationlift: animationlift.includes(etg),
+              }"
+            ></div
           ></button-lift>
         </div>
       </div>
@@ -40,6 +46,8 @@ export default {
       isogidanie: false,
       nowetag: 1,
       ochered: [],
+      activelift: [],
+      animationlift: [],
     };
   },
 
@@ -48,6 +56,8 @@ export default {
       if (this.ochered.includes(etg)) {
         return;
       }
+
+      this.activelift.push(etg);
 
       this.ochered.push(etg);
       await this.gotolift();
@@ -67,6 +77,7 @@ export default {
       }
 
       const ocher = this.ochered[0];
+
       const distance = Math.abs(ocher - this.nowetag);
       const distantion = distance * 1000;
 
@@ -79,7 +90,24 @@ export default {
       });
 
       await new Promise((resolve) => {
-        setTimeout(resolve, distantion + 3000);
+        setTimeout(() => {
+          this.activelift.shift();
+          resolve();
+        }, distantion + 2000);
+      });
+
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          this.animationlift.push(ocher);
+          resolve();
+        }, distantion + 2000);
+      });
+
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          this.animationlift.shift();
+          resolve();
+        }, 3000);
       });
 
       this.ochered.shift();
@@ -136,9 +164,30 @@ export default {
   border: 2px solid #000;
 }
 
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animationlift {
+  background-color: #000;
+  animation: blink 1s infinite;
+}
+
 .navigatelift {
   display: flex;
   flex-direction: column-reverse;
   justify-content: space-around;
+}
+
+.active {
+  background-color: #000;
 }
 </style>
