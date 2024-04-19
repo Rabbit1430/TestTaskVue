@@ -2,8 +2,8 @@
 
 <template>
   <div class="mycontent">
-    <div class="lift">
-      <div class="etag">
+    <div class="lifttask">
+      <div class="lift">
         <div
           class="block"
           :style="{ bottom: positionnow + 'px' }"
@@ -49,6 +49,28 @@ export default {
       activelift: [],
       animationlift: [],
     };
+  },
+  mounted() {
+    this.loadstate();
+    this.continuecode();
+  },
+
+  watch: {
+    positionnow(value) {
+      this.mystate();
+    },
+    nowetag(value) {
+      this.mystate();
+    },
+    ochered(value) {
+      this.mystate();
+    },
+    activelift(value) {
+      this.mystate();
+    },
+    animationlift(value) {
+      this.mystate();
+    },
   },
 
   methods: {
@@ -113,7 +135,39 @@ export default {
       this.ochered.shift();
 
       this.isgoblock = false;
-      await this.gotolift();
+
+      this.mystate();
+      await this.gotolift(this.ochered[0]);
+    },
+
+    mystate() {
+      localStorage.setItem(
+        "liftstate",
+        JSON.stringify({
+          positionnow: this.positionnow,
+          nowetag: this.nowetag,
+          ochered: this.ochered,
+          activelift: this.activelift,
+          animationlift: this.animationlift,
+        })
+      );
+    },
+    loadstate() {
+      const savestate = localStorage.getItem("liftstate");
+      if (savestate) {
+        const state = JSON.parse(savestate);
+        this.positionnow = state.positionnow;
+        this.nowetag = state.nowetag;
+        this.ochered = state.ochered;
+        this.activelift = state.activelift;
+        this.animationlift = state.animationlift;
+      }
+    },
+
+    continuecode() {
+      if (this.ochered.length > 0) {
+        this.gotolift(this.ochered[0]);
+      }
     },
   },
 };
@@ -126,7 +180,7 @@ export default {
   justify-content: center;
   align-items: center;
 }
-.lift {
+.lifttask {
   width: 600px;
   height: 500px;
   display: flex;
@@ -134,7 +188,7 @@ export default {
   justify-content: space-around;
 }
 
-.etag {
+.lift {
   width: 200px;
   height: 100%;
   border: 2px solid #000;
