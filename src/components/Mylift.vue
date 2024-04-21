@@ -2,11 +2,14 @@
 
 <template>
   <div class="mycontent">
-    <div class="lifttask">
+    <div class="lifttask" :style="{ height: numbersetag * 100 + 'px' }">
       <div class="lift">
         <div
           class="block"
-          :style="{ bottom: positionnow + 'px' }"
+          :style="{
+            bottom: positionnow + 'px',
+            transition: 'bottom ' + (numbersetag - 1) + 's ease',
+          }"
           :class="{ block: true, goblock: isgoblock }"
         >
           <span v-if="isactiveup" class="material-symbols-outlined strelka">
@@ -43,11 +46,12 @@
 
 <script>
 import ButtonLift from "@/components/UI/ButtonLift.vue";
+import data from "./etagandlift_config";
 export default {
   components: { ButtonLift },
   data() {
     return {
-      numbersetag: 5,
+      numbersetag: data.etag,
       positionnow: 0,
       buttonclick: false,
       isgoblock: false,
@@ -58,6 +62,7 @@ export default {
       animationlift: [],
       isactiveup: false,
       isactivedown: false,
+      lifts: data.lift,
     };
   },
   mounted() {
@@ -126,7 +131,7 @@ export default {
           this.nowetag = ocher;
           this.positionnow = (ocher - 1) * 100;
           resolve();
-        }, distantion);
+        }, 500);
       });
 
       await new Promise((resolve) => {
@@ -135,14 +140,14 @@ export default {
           this.isactiveup = false;
           this.isactivedown = false;
           resolve();
-        }, distantion + 2000);
+        }, distantion + 3000);
       });
 
       await new Promise((resolve) => {
         setTimeout(() => {
           this.animationlift.push(ocher);
           resolve();
-        }, distantion + 2000);
+        }, 2000);
       });
 
       await new Promise((resolve) => {
@@ -224,14 +229,14 @@ export default {
   height: 100px;
   background-color: aqua;
   bottom: 0;
-  transition: bottom 4s ease-in-out;
+  transition: bottom 4s ease;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .goblock {
-  transition: bottom 4s ease-in-out;
+  transition: bottom 4s ease;
 }
 
 .circle {
