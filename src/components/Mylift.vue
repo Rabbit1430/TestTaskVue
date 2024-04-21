@@ -8,7 +8,15 @@
           class="block"
           :style="{ bottom: positionnow + 'px' }"
           :class="{ block: true, goblock: isgoblock }"
-        ></div>
+        >
+          <span v-if="isactiveup" class="material-symbols-outlined strelka">
+            arrow_upward
+          </span>
+          <span v-if="isactivedown" class="material-symbols-outlined strelka">
+            arrow_downward
+          </span>
+          <span>{{ nowetag }}</span>
+        </div>
       </div>
       <div class="navigatelift">
         <div class="buttonetage" v-for="etg in numbersetag" :key="etg">
@@ -48,6 +56,8 @@ export default {
       ochered: [],
       activelift: [],
       animationlift: [],
+      isactiveup: false,
+      isactivedown: false,
     };
   },
   mounted() {
@@ -56,19 +66,19 @@ export default {
   },
 
   watch: {
-    positionnow(value) {
+    positionnow() {
       this.mystate();
     },
-    nowetag(value) {
+    nowetag() {
       this.mystate();
     },
-    ochered(value) {
+    ochered() {
       this.mystate();
     },
-    activelift(value) {
+    activelift() {
       this.mystate();
     },
-    animationlift(value) {
+    animationlift() {
       this.mystate();
     },
   },
@@ -103,6 +113,14 @@ export default {
       const distance = Math.abs(ocher - this.nowetag);
       const distantion = distance * 1000;
 
+      if (this.nowetag < ocher) {
+        this.isactiveup = true;
+      }
+
+      if (this.nowetag > ocher) {
+        this.isactivedown = true;
+      }
+
       await new Promise((resolve) => {
         setTimeout(() => {
           this.nowetag = ocher;
@@ -114,6 +132,8 @@ export default {
       await new Promise((resolve) => {
         setTimeout(() => {
           this.activelift.shift();
+          this.isactiveup = false;
+          this.isactivedown = false;
           resolve();
         }, distantion + 2000);
       });
@@ -167,6 +187,7 @@ export default {
     continuecode() {
       if (this.ochered.length > 0) {
         this.gotolift(this.ochered[0]);
+        this.isactive = false;
       }
     },
   },
@@ -204,6 +225,9 @@ export default {
   background-color: aqua;
   bottom: 0;
   transition: bottom 4s ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .goblock {
