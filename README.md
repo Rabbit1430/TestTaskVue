@@ -35,4 +35,7 @@ npm run start
 
 ## Демонстарция реализации
 
-![Демонстрация работы веб-сайта]
+![Демонстрация работы веб-сайта](https://github.com/Rabbit1430/TestTaskVue/blob/main/1.gif)
+
+
+![Демонстрация работы веб-сайта](https://github.com/Rabbit1430/TestTaskVue/blob/main/2.gif)
