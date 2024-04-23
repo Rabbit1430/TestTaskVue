@@ -12,8 +12,8 @@ export default {};
 
 <style scoped>
 .mybutton {
-  width: 40px;
-  height: 40px;
+  width: 20px;
+  height: 20px;
   border: 2px solid #000;
   border-radius: 5px;
   display: flex;

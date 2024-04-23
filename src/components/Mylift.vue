@@ -2,25 +2,17 @@
 
 <template>
   <div class="mycontent">
-    <div class="lifttask" :style="{ height: numbersetag * 100 + 'px' }">
-      <div class="lift">
-        <div
-          class="block"
-          :style="{
-            bottom: positionnow + 'px',
-            transition: 'bottom ' + (numbersetag - 1) + 's ease',
-          }"
-          :class="{ block: true, goblock: isgoblock }"
-        >
-          <span v-if="isactiveup" class="material-symbols-outlined strelka">
-            arrow_upward
-          </span>
-          <span v-if="isactivedown" class="material-symbols-outlined strelka">
-            arrow_downward
-          </span>
-          <span>{{ nowetag }}</span>
-        </div>
-      </div>
+    <div
+      class="lifttask"
+      :style="{
+        height: numbersetag * 50 + 'px',
+        width: countlift * 250 + 'px',
+      }"
+    >
+      <set-lift  v-for="(lift, index) in lifts"
+        :key="index"
+        :lift="lift"
+        :numbersetag="numbersetag" />
       <div class="navigatelift">
         <div class="buttonetage" v-for="etg in numbersetag" :key="etg">
           <div class="chislo">{{ etg }}</div>
@@ -45,91 +37,123 @@
 </template>
 
 <script>
+
 import ButtonLift from "@/components/UI/ButtonLift.vue";
 import data from "./etagandlift_config";
+import SetLift from './SetLift.vue';
 export default {
-  components: { ButtonLift },
+  components: { ButtonLift , SetLift},
+  
   data() {
     return {
       numbersetag: data.etag,
-      positionnow: 0,
       buttonclick: false,
-      isgoblock: false,
-      isogidanie: false,
-      nowetag: 1,
-      ochered: [],
       activelift: [],
       animationlift: [],
-      isactiveup: false,
-      isactivedown: false,
-      lifts: data.lift,
+      countlift: data.lift,
+      myetag: [],
+      lifts: Array.from({ length: data.lift }).map(() => ({
+        positionnow: 0,
+        ochered: [],
+        isgoblock: false,
+        isactiveup: false,
+        isactivedown: false,
+        nowetag: 1,
+        isogidanie: false,
+        
+      })),
+      
     };
   },
-  mounted() {
-    this.loadstate();
-    this.continuecode();
-  },
+ 
 
-  watch: {
-    positionnow() {
-      this.mystate();
-    },
-    nowetag() {
-      this.mystate();
-    },
-    ochered() {
-      this.mystate();
-    },
+  mounted() {
+this.loadstate()
+this.continuecode()
+  
+},
+
+watch: {
     activelift() {
       this.mystate();
     },
     animationlift() {
       this.mystate();
     },
+    lifts() {
+      this.mystate()
+    },
+   
+    myetag(){
+      this.mystate()
+    }
   },
+  
 
   methods: {
+    
     async GoLift(etg) {
-      if (this.ochered.includes(etg)) {
-        return;
-      }
 
-      this.activelift.push(etg);
+      this.myetag.push(etg);
+      // Вычисление ближнего лифта
+      const distnclift = this.lifts.map((lift) => Math.abs(lift.nowetag - etg));
 
-      this.ochered.push(etg);
-      await this.gotolift();
+const indexdistlift = distnclift.indexOf(Math.min(...distnclift));
+
+  const finallift = this.lifts[indexdistlift];
+  
+
+if (finallift.ochered.includes(etg)) {
+  return;
+}
+
+
+this.activelift.push(etg);
+
+finallift.ochered.push(etg);
+
+
+// console.log(this.myetag);
+
+this.mystate();
+await this.gotolift(finallift);
+
     },
 
-    async gotolift() {
-      if (this.isgoblock || this.ochered.length === 0) {
+
+    //Движение лифта и анимация кнопок
+    async gotolift(finallift) {
+      if (finallift.isgoblock || finallift.ochered.length === 0) {
         return;
       }
 
-      this.isgoblock = true;
-      if (this.isogidanie) {
-        if (this.ochered.includes(ocher)) {
-          this.isgoblock = false;
+      finallift.isgoblock = true;
+      if (finallift.isogidanie) {
+        if (finallift.ochered.includes(ocher)) {
+          finallift.isgoblock = false;
           return;
         }
       }
 
-      const ocher = this.ochered[0];
+      const ocher = finallift.ochered[0];
 
-      const distance = Math.abs(ocher - this.nowetag);
+      const distance = Math.abs(ocher - finallift.nowetag);
+
       const distantion = distance * 1000;
 
-      if (this.nowetag < ocher) {
-        this.isactiveup = true;
+      if (finallift.nowetag < ocher) {
+        finallift.isactiveup = true;
       }
 
-      if (this.nowetag > ocher) {
-        this.isactivedown = true;
+      if (finallift.nowetag > ocher) {
+        finallift.isactivedown = true;
       }
 
       await new Promise((resolve) => {
         setTimeout(() => {
-          this.nowetag = ocher;
-          this.positionnow = (ocher - 1) * 100;
+          finallift.nowetag = ocher;
+
+          finallift.positionnow = (ocher - 1) * 50;
           resolve();
         }, 500);
       });
@@ -137,8 +161,8 @@ export default {
       await new Promise((resolve) => {
         setTimeout(() => {
           this.activelift.shift();
-          this.isactiveup = false;
-          this.isactivedown = false;
+          finallift.isactiveup = false;
+          finallift.isactivedown = false;
           resolve();
         }, distantion + 3000);
       });
@@ -157,44 +181,74 @@ export default {
         }, 3000);
       });
 
-      this.ochered.shift();
+      finallift.ochered.shift();
 
-      this.isgoblock = false;
+      finallift.isgoblock = false;
 
+      this.myetag.shift()
       this.mystate();
-      await this.gotolift(this.ochered[0]);
+      
+      await this.gotolift(finallift);
+      
+      
     },
 
+ // localStorage
     mystate() {
-      localStorage.setItem(
-        "liftstate",
-        JSON.stringify({
-          positionnow: this.positionnow,
-          nowetag: this.nowetag,
-          ochered: this.ochered,
-          activelift: this.activelift,
-          animationlift: this.animationlift,
-        })
-      );
-    },
-    loadstate() {
-      const savestate = localStorage.getItem("liftstate");
-      if (savestate) {
-        const state = JSON.parse(savestate);
-        this.positionnow = state.positionnow;
-        this.nowetag = state.nowetag;
-        this.ochered = state.ochered;
-        this.activelift = state.activelift;
-        this.animationlift = state.animationlift;
-      }
-    },
+      const liftstate = this.lifts.map(lift => ({
+      positionnow: lift.positionnow,
+      ochered: lift.ochered,
+      nowetag: lift.nowetag
+    }));
+    localStorage.setItem('liftstate', JSON.stringify(liftstate));
 
-    continuecode() {
-      if (this.ochered.length > 0) {
-        this.gotolift(this.ochered[0]);
-        this.isactive = false;
-      }
-    },
+    localStorage.setItem(
+      "animebutton",
+      JSON.stringify({
+        activelift: this.activelift,
+        continue: this.continue,
+        myetag: this.myetag
+     
+      })
+    );
+  },
+  loadstate() {
+    const savelift = localStorage.getItem('liftstate');
+    if (savelift) {
+      const datalift = JSON.parse(savelift);
+      datalift.forEach((dtlift, index) => {
+        const lift = this.lifts[index];
+        if (lift) {
+          lift.positionnow = dtlift.positionnow;
+          lift.ochered = dtlift.ochered;
+          lift.nowetag = dtlift.nowetag;
+        }
+      });
+    }
+
+    const saveanime = localStorage.getItem('animebutton');
+    if (saveanime) {
+      const anime = JSON.parse(saveanime);
+      this.activelift = anime.activelift;
+      this.continue = anime.continue;
+      this.myetag = anime.myetag;
+     
+    }
+
+   
+  
+  },
+  
+  continuecode() {
+ 
+if(this.myetag.length > 0) {
+  this.lifts.forEach(finallift => {
+  
+      this.gotolift(finallift);
+  
+  });
+}
+  }
   },
 };
 </script>
@@ -208,7 +262,7 @@ export default {
 }
 .lifttask {
   width: 600px;
-  height: 500px;
+  height: 250px;
   display: flex;
 
   justify-content: space-around;
@@ -226,7 +280,7 @@ export default {
 .block {
   position: absolute;
   width: 100%;
-  height: 100px;
+  height: 50px;
   background-color: aqua;
   bottom: 0;
   transition: bottom 4s ease;
@@ -240,8 +294,8 @@ export default {
 }
 
 .circle {
-  width: 20px;
-  height: 20px;
+  width: 10px;
+  height: 10px;
   background-color: transparent;
   border-radius: 50%;
   border: 2px solid #000;

@@ -1,6 +1,6 @@
 /** @format */
 
 export default {
-  etag: 9,
+  etag: 8,
   lift: 3,
 };

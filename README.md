@@ -1,7 +1,38 @@
-# Vue 3 + Vite
+# Управление  и анимация движения лифта
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+График курса валют - это веб-приложение, для управления лифтами.(Тестовое задание)
 
-## Recommended IDE Setup
+---
 
-- [VS Code](https://code.visualstudio.com/) + [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (previously Volar) and disable Vetur
+## Установка и настройка
+
+Для установки и запуска приложения необходим Node.js и npm.
+
+1. Клонируйте репозиторий:
+
+```bash
+git clone git@github.com:Rabbit1430/TestTaskVue.git
+```
+
+2. Установите зависимости:
+
+```bash
+npm install
+```
+
+3. Запустите приложение:
+
+```bash
+npm run start
+```
+
+
+
+## Основные функции
+
+- **Выбор этажей**: Вы можете выбрать один или несколько этажей, приложение обработает этажи последовательно
+- **Выбор количества лифтов**: Пользователь может указать количество лифтов в конфигурационном файле etagandlift_config.js
+
+## Демонстарция реализации
+
+![Демонстрация работы веб-сайта]
